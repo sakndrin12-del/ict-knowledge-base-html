@@ -1,0 +1,11 @@
+# ไฟล์ตั้งค่าฐานข้อมูลจริง (ห้ามนำขึ้น Git)
+/config.php
+
+# ไฟล์อัปโหลดของผู้ใช้ (คงเฉพาะ uploads/.htaccess ไว้ใน Git)
+/uploads/*
+!/uploads/.htaccess
+
+# ไฟล์ระบบปฏิบัติการและ Editor
+.DS_Store
+Thumbs.db
+*.log

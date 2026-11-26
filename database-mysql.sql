@@ -1,3 +1,5 @@
+SET FOREIGN_KEY_CHECKS = 0;
+
 -- MySQL dump 10.13  Distrib 26.10.0, for Win64 (x86_64)
 --
 -- Host: localhost    Database: ict_knowledge_base
@@ -14,14 +16,6 @@
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
-SET @MYSQLDUMP_TEMP_LOG_BIN = @@SESSION.SQL_LOG_BIN;
-SET @@SESSION.SQL_LOG_BIN= 0;
-
---
--- GTID state at the beginning of the backup 
---
-
-SET @@GLOBAL.GTID_PURGED=/*!80000 '+'*/ 'e7c82203-e7be-11f1-a9a9-40c2baf5b9d0:1-566';
 
 --
 -- Current Database: `ict_knowledge_base`
@@ -155,6 +149,10 @@ INSERT INTO `articles` VALUES (1,1,'การตั้งค่า IP และ 
 /*!40000 ALTER TABLE `articles` ENABLE KEYS */;
 UNLOCK TABLES;
 
+ALTER TABLE `articles`
+  ADD COLUMN `created_by_name` varchar(160) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'ICT Administrator' AFTER `featured`,
+  ADD COLUMN `updated_by_name` varchar(160) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'ICT Administrator' AFTER `created_by_name`;
+
 --
 -- Table structure for table `categories`
 --
@@ -234,7 +232,46 @@ LOCK TABLES `sitesetting` WRITE;
 INSERT INTO `sitesetting` VALUES ('contact','{\"note\": \"ศูนย์พัฒนาทักษะและการเรียนรู้ ICT เทศบาลนครขอนแก่น บริการพื้นที่การเรียนรู้ ห้องอบรมคอมพิวเตอร์ และให้คำปรึกษาด้านไอที\", \"email\": \"info.kkict@gmail.com\", \"hours\": \"อังคาร – อาทิตย์ เวลา 09:00 – 17:00 น. (หยุดวันจันทร์และวันหยุดนักขัตฤกษ์)\", \"phone\": \"084-583-0208\", \"lineId\": \"KKICT-Training\", \"lineUrl\": \"https://line.me/R/ti/g/sTeVI-fA9K\", \"location\": \"ชั้น 2 ตลาดสดเทศบาล 1 ถนนกลางเมือง ต.ในเมือง อ.เมืองขอนแก่น จ.ขอนแก่น 40000\"}','2026-11-24 08:44:12.574');
 /*!40000 ALTER TABLE `sitesetting` ENABLE KEYS */;
 UNLOCK TABLES;
-SET @@SESSION.SQL_LOG_BIN = @MYSQLDUMP_TEMP_LOG_BIN;
+
+--
+-- Table structure for table `login_attempts`
+--
+
+DROP TABLE IF EXISTS `login_attempts`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `login_attempts` (
+  `attempt_id` int NOT NULL AUTO_INCREMENT,
+  `username` varchar(80) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `ip_address` varchar(45) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `attempted_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`attempt_id`),
+  KEY `login_attempts_username_attempted_at_idx` (`username`,`attempted_at`),
+  KEY `login_attempts_ip_address_attempted_at_idx` (`ip_address`,`attempted_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `audit_logs`
+--
+
+DROP TABLE IF EXISTS `audit_logs`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `audit_logs` (
+  `log_id` int NOT NULL AUTO_INCREMENT,
+  `admin_id` int DEFAULT NULL,
+  `admin_name` varchar(160) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `action` varchar(80) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `target_type` varchar(60) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `target_id` int DEFAULT NULL,
+  `detail` varchar(500) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`log_id`),
+  KEY `audit_logs_created_at_idx` (`created_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -246,3 +283,4 @@ SET @@SESSION.SQL_LOG_BIN = @MYSQLDUMP_TEMP_LOG_BIN;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
 -- Dump completed on 2026-11-24 15:44:38
+SET FOREIGN_KEY_CHECKS = 1;
